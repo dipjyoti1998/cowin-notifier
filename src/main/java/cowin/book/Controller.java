@@ -14,9 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -59,19 +57,42 @@ public class Controller implements CommandLineRunner {
             System.out.println(districts.getJSONObject(i).getString("district_id") + ": " + districts.getJSONObject(i).getString("district_name"));
         }
 
-        System.out.print("Enter District id: ");
-        String districtId = sc.nextLine();
+        System.out.print("Enter District id/ids in comma separated format: ");
+        String districtIds = sc.nextLine();
+        System.out.println("-----------------------------------------------");
+
+        String[] lineVector = districtIds.split(",");
+        List<Integer> districtsValue=new ArrayList<>();
+        for (int it=0;it<lineVector.length;it++){
+            districtsValue.add(Integer.parseInt(lineVector[it]));
+        }
+
+
+        System.out.print("Age group required 0:for 18-44 & 1:for 45+ :");
+        int ageId = sc.nextInt();
+        System.out.println("-----------------------------------------------");
+        int age;
+        if(ageId==0)age=18;
+        else if(ageId==1)age=45;
+        else return;
+
+        System.out.print("minimum vaccine for notification i.e minimum 1 required :");
+        int minimum = sc.nextInt();
         System.out.println("-----------------------------------------------");
 
         while (true) {
 
+            for (int districtId:districtsValue){
             String dateInString = new SimpleDateFormat(pattern).format(new Date());
 
             String response
                     = restTemplate.getForObject(availabilityCheckURL + "district_id=" + districtId + "&date=" + dateInString, String.class);
 
+
+
             JSONObject obj = new JSONObject(response);
             JSONArray centers = obj.getJSONArray("centers");
+                System.out.println("district name: "+centers.getJSONObject(0).getString("district_name"));
             System.out.println("total centers found: " + centers.length());
             boolean flag=false;
             for (int i = 0; i < centers.length(); i++) {
@@ -79,7 +100,7 @@ public class Controller implements CommandLineRunner {
                 for (int j = 0; j < sessions.length(); j++) {
                     int min_age_limit = sessions.getJSONObject(j).getInt("min_age_limit");
                     int available_capacity_dose1 = sessions.getJSONObject(j).getInt("available_capacity_dose1");
-                    if (min_age_limit == 18 && available_capacity_dose1 >= 1) {
+                    if (min_age_limit == age && available_capacity_dose1 >= minimum) {
                         System.out.println(centers.getJSONObject(i).getString("name"));
                         sound.soundPlay();
                         flag=true;
@@ -93,6 +114,6 @@ public class Controller implements CommandLineRunner {
             System.out.println("-----------------------------------------------");
             TimeUnit.SECONDS.sleep(3);
 
-        }
+        }}
     }
 }
