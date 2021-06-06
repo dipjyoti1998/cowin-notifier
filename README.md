@@ -1,10 +1,14 @@
 # cowin-notifier
+Description
+------
 This java springboot based script notify when free slot available in your selected districts. 
 
 This can notify when slot available in one or more districts and It does not require OTP so runs for infinite time until user stops and beeps to notify when any viable option found.
 
 You can get only slot information with this script, booking is not supported now.
 
+Installation:
+------
 First go to the file location and open a cmd terminal there.
 
 If java is installed in command line(to check type : **java -version** ) use the following command in terminal to run-
