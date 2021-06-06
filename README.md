@@ -15,7 +15,9 @@ Installation:
 
 https://github.com/dipjyoti1998/cowin-notifier/releases/download/v1.0.0/book-1.0.0.jar
 
-Navigate to the file location and open a cmd terminal there. Open the termianl in your mac or PC and type **java -jar path_to_the_java_file**
+Navigate to the file location and open a cmd terminal there. Open the termianl in your mac or windows 
+
+and type **java -jar path_to_the_java_file**
 
 
 
