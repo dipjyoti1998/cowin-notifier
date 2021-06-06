@@ -17,8 +17,9 @@ If java is installed in command line(to check type : **java -version** ) use the
 **java -jar  target/book-1.0.0.jar**
 
 
-if java not installed please install it-
---------
+If java not installed please install it-
+---
 **guidelines**- https://www.youtube.com/watch?v=9s8saAeKEfg&ab_channel=ProgrammingKnowledge2
-after installing java run the above command
+
+After installing java run the above command
 
