@@ -5,7 +5,7 @@ This can notify when slot available in one or more districts and It does not req
 
 You can get only slot information with this script, booking is not supported now.
 
-If java is installed in command line use the following command-
 
-**
-java -jar book-1.0.0.jar **
+If java is installed in command line use the following command(to check type : **java -version** )-
+
+**java -jar book-1.0.0.jar**
