@@ -1,21 +1,15 @@
 package cowin.book;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import javax.sound.sampled.LineUnavailableException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -65,8 +59,8 @@ public class Controller implements ApplicationRunner {
         System.out.println("-----------------------------------------------");
 
         String[] lineVector = districtIds.split(",");
-        List<Integer> districtsValue=new ArrayList<>();
-        for (int it=0;it<lineVector.length;it++){
+        List<Integer> districtsValue = new ArrayList<>();
+        for (int it = 0; it < lineVector.length; it++) {
             districtsValue.add(Integer.parseInt(lineVector[it]));
         }
 
@@ -75,50 +69,64 @@ public class Controller implements ApplicationRunner {
         int ageId = sc.nextInt();
         System.out.println("-----------------------------------------------");
         int age;
-        if(ageId==0)age=18;
-        else if(ageId==1)age=45;
+        if (ageId == 0) age = 18;
+        else if (ageId == 1) age = 45;
         else return;
+
+        System.out.print("Dose required 1:for dose1 & 2:for dose2 :");
+        int doseType = sc.nextInt();
+        System.out.println("-----------------------------------------------");
 
         System.out.print("minimum vaccine for notification i.e minimum 1 required :");
         int minimum = sc.nextInt();
         System.out.println("-----------------------------------------------");
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("search start date(7 days from start day) default:Today in format dd-MM-yyyy:");
+        String startDay = scanner.nextLine();
+        System.out.println("-----------------------------------------------");
+
         while (true) {
 
-            for (int districtId:districtsValue){
-            String dateInString = new SimpleDateFormat(pattern).format(new Date());
+            for (int districtId : districtsValue) {
+                String dateInString = new SimpleDateFormat(pattern).format(new Date());
+                if (!startDay.equals("")) dateInString = startDay;
 
-            String response
-                    = restTemplate.getForObject(availabilityCheckURL + "district_id=" + districtId + "&date=" + dateInString, String.class);
+                String response
+                        = restTemplate.getForObject(availabilityCheckURL + "district_id=" + districtId + "&date=" + dateInString, String.class);
 
 
+                JSONObject obj = new JSONObject(response);
+                JSONArray centers = obj.getJSONArray("centers");
+                System.out.println("district name: " + centers.getJSONObject(0).getString("district_name"));
+                System.out.println("total centers found: " + centers.length());
+                boolean flag = false;
+                for (int i = 0; i < centers.length(); i++) {
+                    JSONArray sessions = centers.getJSONObject(i).getJSONArray("sessions");
+                    for (int j = 0; j < sessions.length(); j++) {
+                        int min_age_limit = sessions.getJSONObject(j).getInt("min_age_limit");
+                        int available_capacity_dose1 = sessions.getJSONObject(j).getInt("available_capacity_dose1");
+                        int available_capacity_dose2 = sessions.getJSONObject(j).getInt("available_capacity_dose2");
+                        int available_capacity_dose = available_capacity_dose1;
+                        if (doseType == 1) available_capacity_dose = available_capacity_dose1;
+                        else if (doseType == 2) available_capacity_dose = available_capacity_dose2;
+                        if (min_age_limit == age && available_capacity_dose >= minimum) {
+                            System.out.println(centers.getJSONObject(i).getString("name"));
+                            sound.soundPlay();
+                            flag = true;
 
-            JSONObject obj = new JSONObject(response);
-            JSONArray centers = obj.getJSONArray("centers");
-                System.out.println("district name: "+centers.getJSONObject(0).getString("district_name"));
-            System.out.println("total centers found: " + centers.length());
-            boolean flag=false;
-            for (int i = 0; i < centers.length(); i++) {
-                JSONArray sessions = centers.getJSONObject(i).getJSONArray("sessions");
-                for (int j = 0; j < sessions.length(); j++) {
-                    int min_age_limit = sessions.getJSONObject(j).getInt("min_age_limit");
-                    int available_capacity_dose1 = sessions.getJSONObject(j).getInt("available_capacity_dose1");
-                    if (min_age_limit == age && available_capacity_dose1 >= minimum) {
-                        System.out.println(centers.getJSONObject(i).getString("name"));
-                        sound.soundPlay();
-                        flag=true;
+                        }
 
                     }
 
                 }
+                if (flag == false) System.out.println("No viable option found!");
+                System.out.println("-----------------------------------------------");
+
 
             }
-            if(flag==false) System.out.println("No viable option found!");
-            System.out.println("-----------------------------------------------");
-
-
-        }
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(4);
         }
     }
 
