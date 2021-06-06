@@ -5,8 +5,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@RestController
-public class Controller implements CommandLineRunner {
+@Component
+public class Controller implements ApplicationRunner {
     @Value("${CALENDAR_URL_DISTRICT}")
     String availabilityCheckURL;
     @Value("${STATE_URL}")
@@ -30,7 +33,7 @@ public class Controller implements CommandLineRunner {
     private Sound sound;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -112,8 +115,12 @@ public class Controller implements CommandLineRunner {
             }
             if(flag==false) System.out.println("No viable option found!");
             System.out.println("-----------------------------------------------");
-            TimeUnit.SECONDS.sleep(3);
 
-        }}
+
+        }
+            TimeUnit.SECONDS.sleep(3);
+        }
     }
+
+
 }
